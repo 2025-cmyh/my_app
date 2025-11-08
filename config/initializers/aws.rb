@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# aws credentials for the web app are stored in the secrets
+# AWS/Cloudflare R2 credentials for the web app are stored in the secrets
 AWS_ACCESS_KEY = GlobalConfig.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_KEY = GlobalConfig.get("AWS_SECRET_ACCESS_KEY")
 AWS_S3_ENDPOINT = GlobalConfig.get("AWS_S3_ENDPOINT", "https://s3.amazonaws.com")
@@ -11,9 +11,11 @@ aws_config = {
   credentials: Aws::Credentials.new(AWS_ACCESS_KEY, AWS_SECRET_KEY)
 }
 
-# Support for MinIO in development and test environments
-if Rails.env.development? || Rails.env.test?
-  aws_config[:endpoint] = AWS_S3_ENDPOINT if AWS_S3_ENDPOINT.present?
+# Support for S3-compatible services (MinIO, Cloudflare R2, etc.)
+# R2 requires force_path_style and custom endpoint configuration
+if AWS_S3_ENDPOINT.present? && AWS_S3_ENDPOINT != "https://s3.amazonaws.com"
+  aws_config[:endpoint] = AWS_S3_ENDPOINT
+  # Force path-style URLs for S3-compatible services (required for R2 and MinIO)
   Aws.config[:s3] = { force_path_style: true }
 end
 

@@ -26,7 +26,9 @@ module S3Retrievable
     tempfile.rewind
     yield tempfile
   rescue Aws::S3::Errors::NotFound => e
-    raise e.exception("Key = #{s3_key} -- #{self.class.name}.id = #{id}")
+    raise e.exception("S3 object not found - Bucket: #{S3_BUCKET}, Key: #{s3_key}, Model: #{self.class.name}, ID: #{id}")
+  rescue Aws::S3::Errors::ServiceError => e
+    raise e.exception("S3 service error - Bucket: #{S3_BUCKET}, Key: #{s3_key}, Model: #{self.class.name}, ID: #{id}, Error: #{e.message}")
   ensure
     tempfile&.close!
   end

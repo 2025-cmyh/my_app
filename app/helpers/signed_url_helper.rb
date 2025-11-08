@@ -14,7 +14,9 @@ module SignedUrlHelper
       obj = Aws::S3::Resource.new.bucket(S3_BUCKET).object(s3_key)
       [obj.content_length, obj.public_url]
     rescue Aws::S3::Errors::NotFound => e
-      raise e.exception("Key = #{s3_key}")
+      raise e.exception("S3 object not found - Bucket: #{S3_BUCKET}, Key: #{s3_key}")
+    rescue Aws::S3::Errors::ServiceError => e
+      raise e.exception("S3 service error - Bucket: #{S3_BUCKET}, Key: #{s3_key}, Error: #{e.message}")
     end
     public_url_path = URI.parse(public_url_path).path
     s3_path = public_url_path.to_s.sub(%r{^/#{Regexp.escape(S3_BUCKET)}}o, "") # remove the S3 bucket name portion

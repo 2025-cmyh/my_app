@@ -26,6 +26,10 @@ module MultipartTransfer
       transfer_non_s3_file_to_s3(destination_key, s3_guid, uri)
     end
     destination_key
+  rescue Aws::S3::Errors::ServiceError => e
+    raise e.exception("Failed to transfer file to S3 - Bucket: #{S3_BUCKET}, Key: #{destination_key}, Source: #{source_file_url}, Error: #{e.message}")
+  rescue StandardError => e
+    raise StandardError.new("Failed to transfer file to S3 - Bucket: #{S3_BUCKET}, Key: #{destination_key}, Source: #{source_file_url}, Error: #{e.message}")
   end
 
   def self.transfer_non_s3_file_to_s3(destination_key, s3_guid, uri)
@@ -44,6 +48,10 @@ module MultipartTransfer
         temp_file.close(true)
       end
     end
+  rescue Aws::S3::Errors::ServiceError => e
+    raise e.exception("Failed to upload file to S3 during transfer - Bucket: #{S3_BUCKET}, Key: #{destination_key}, Source URI: #{uri}, Error: #{e.message}")
+  rescue StandardError => e
+    raise StandardError.new("Failed to transfer non-S3 file to S3 - Bucket: #{S3_BUCKET}, Key: #{destination_key}, Source URI: #{uri}, Error: #{e.message}")
   end
 
   def self.fetch_content_type(uri)
