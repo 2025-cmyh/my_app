@@ -230,7 +230,7 @@ describe WithFileProperties do
 
     expect do
       file.analyze
-    end.to raise_error(Aws::S3::Errors::NotFound, /Key = attachments\/missing.txt .* ProductFile.id = #{file.id}/)
+    end.to raise_error(Aws::S3::Errors::NotFound, /S3 object not found during file analysis - Bucket: #{S3_BUCKET}, Key: attachments\/missing.txt, Model: ProductFile, ID: #{file.id}/)
   end
 
   context "with a incorrect s3_key" do
