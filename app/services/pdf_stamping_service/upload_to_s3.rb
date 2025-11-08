@@ -13,5 +13,9 @@ module PdfStampingService::UploadToS3
     )
 
     "#{AWS_S3_ENDPOINT}/#{S3_BUCKET}/#{path}"
+  rescue Aws::S3::Errors::ServiceError => e
+    raise e.exception("Failed to upload stamped PDF to S3 - Bucket: #{S3_BUCKET}, Key: #{path}, Product File ID: #{product_file.id}, Error: #{e.message}")
+  rescue StandardError => e
+    raise StandardError.new("Failed to upload stamped PDF to S3 - Bucket: #{S3_BUCKET}, Key: #{path}, Product File ID: #{product_file.id}, Error: #{e.message}")
   end
 end
