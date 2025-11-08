@@ -68,7 +68,7 @@ describe "S3Retrievable" do
 
       expect do
         record.download_original { }
-      end.to raise_error(Aws::S3::Errors::NotFound, /Key = attachments\/missing.txt .* #{model.name}.id = #{record.id}/)
+      end.to raise_error(Aws::S3::Errors::NotFound, /S3 object not found - Bucket: #{S3_BUCKET}, Key: attachments\/missing.txt, Model: #{model.name}, ID: #{record.id}/)
     end
   end
 

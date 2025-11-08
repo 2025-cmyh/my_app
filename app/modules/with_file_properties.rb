@@ -43,7 +43,9 @@ module WithFileProperties
     begin
       self.size = s3_object.content_length
     rescue Aws::S3::Errors::NotFound => e
-      raise e.exception("Key = #{s3_key} -- #{self.class.name}.id = #{id}")
+      raise e.exception("S3 object not found during file analysis - Bucket: #{S3_BUCKET}, Key: #{s3_key}, Model: #{self.class.name}, ID: #{id}")
+    rescue Aws::S3::Errors::ServiceError => e
+      raise e.exception("S3 service error during file analysis - Bucket: #{S3_BUCKET}, Key: #{s3_key}, Model: #{self.class.name}, ID: #{id}, Error: #{e.message}")
     end
     file_uuid = SecureRandom.uuid
     logger.info("Analyze -- writing #{s3_url} to #{file_uuid}")

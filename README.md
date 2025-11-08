@@ -165,21 +165,25 @@ App can be booted without any custom credentials. But if you would like to use s
 
 #### S3 Bucket Setup
 
-After configuring your AWS credentials, you need to create the specific S3 buckets required for development. The application uses hardcoded bucket names as defined in `config/initializers/aws.rb`:
+The application supports both **AWS S3** and **Cloudflare R2** (or any S3-compatible storage service).
 
-**Required S3 Buckets:**
+After configuring your credentials, you need to create the specific buckets required for development. The application uses hardcoded bucket names as defined in `config/initializers/aws.rb`:
+
+**Required Buckets:**
 
 - `gumroad_dev` - Main storage bucket for development
 - `gumroad-dev-public-storage` - Public storage bucket for development
 
-**Create the buckets using AWS CLI:**
+**Option 1: Using AWS S3**
+
+Create the buckets using AWS CLI:
 
 ```bash
 aws s3 mb s3://gumroad_dev
 aws s3 mb s3://gumroad-dev-public-storage
 ```
 
-**Or create them via AWS Console:**
+Or create them via AWS Console:
 
 1. Go to the [S3 Console](https://console.aws.amazon.com/s3/)
 2. Click "Create bucket"
@@ -187,6 +191,21 @@ aws s3 mb s3://gumroad-dev-public-storage
 4. Choose your preferred region (should match `AWS_DEFAULT_REGION`)
 5. Keep default settings and create the bucket
 6. Repeat steps 2-5 for `gumroad-dev-public-storage`
+
+**Option 2: Using Cloudflare R2**
+
+1. Set up R2 in your Cloudflare dashboard
+2. Create the required buckets: `gumroad_dev` and `gumroad-dev-public-storage`
+3. Generate R2 API tokens from the Cloudflare dashboard
+4. Configure your `.env` file with:
+   ```
+   AWS_ACCESS_KEY_ID=<your-r2-access-key>
+   AWS_SECRET_ACCESS_KEY=<your-r2-secret-key>
+   AWS_S3_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
+   AWS_DEFAULT_REGION=auto
+   ```
+
+The application automatically detects S3-compatible services and uses path-style URLs when a custom endpoint is configured.
 
 > **Note:** These exact bucket names are required because they are hardcoded in the application configuration. Using different names will result in `AccessDenied` errors during file uploads.
 

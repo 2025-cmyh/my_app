@@ -25,5 +25,9 @@ class ExpiringS3FileService
     # https://docs.aws.amazon.com/sdkforruby/api/Aws/S3/Object.html#upload_file-instance_method
     s3_obj.upload_file(@file, content_type: MIME::Types.type_for(@key).first.to_s)
     s3_obj.presigned_url(:get, expires_in: @expiry, response_content_disposition: "attachment")
+  rescue Aws::S3::Errors::ServiceError => e
+    raise e.exception("Failed to upload file to S3 - Bucket: #{@bucket}, Key: #{@key}, Error: #{e.message}")
+  rescue StandardError => e
+    raise StandardError.new("Failed to upload file to S3 - Bucket: #{@bucket}, Key: #{@key}, Error: #{e.message}")
   end
 end

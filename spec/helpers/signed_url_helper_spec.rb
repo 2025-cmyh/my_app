@@ -64,7 +64,7 @@ describe SignedUrlHelper do
 
     expect do
       signed_download_url_for_s3_key_and_filename("attachments/missing.txt", "filename")
-    end.to raise_error(Aws::S3::Errors::NotFound, /Key = attachments\/missing.txt/)
+    end.to raise_error(Aws::S3::Errors::NotFound, /S3 object not found - Bucket: #{S3_BUCKET}, Key: attachments\/missing.txt/)
   end
 
   describe "#file_needs_cache_key?" do
